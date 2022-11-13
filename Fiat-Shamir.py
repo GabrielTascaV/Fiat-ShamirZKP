@@ -4,6 +4,9 @@ class Servidor:
     def _init_(self):
         self.senhaUsuario = 0
 
+    def set_senha(self,senha):
+        self.senhaUsuario = senha
+
     def register_server(self,r,n):
         func_registro = (r ** 2) % n
         self.calculoSenha = func_registro
@@ -15,11 +18,8 @@ class Servidor:
         return self.calculoSenha
 
     def verifica(x,y,v,c,n):
-        print(y)
         y_quad = y ** 2
-        print("y^2 = ", y_quad)
         calculo = (x * (v ** c)) % n
-        print("calculo = ", calculo)
         y_mod = y_quad % n
         calc_mod = calculo % n
         if y_mod == calculo:
@@ -65,28 +65,52 @@ def calcula_v(s,n):
 
 def calcula_y(r,s,c,n):
     y = (r * (s ** c)) % n
-    print("Y = ",y)
     return y
 
+def cadastro_usuario(n,url,user,server):
+    #Digita a senha
+    senha = input("Digite sua senha de cadastro: ")
+    user.set_senha(user,senha)
+    #transforma a senha e url em um Hash e armazena
+    user.register_user(user,url)
+    print("Cadastrado com sucesso")
+
+def log_in(user,n,v,server,url):
+    #Digita a senha de Log-In
+    nova_senha =input("Digite sua senha para log in: ")
+    user.set_senha(user,nova_senha)
+    user.register_user(user,url)
+    accept = 0
+    #Faz o loop 5 vezes pois caso Challenge de 0 de primeira não faria sentido o teste
+    for i in range(0,5):
+        #Seleciona um Int Aleatorio
+        r = random.randint(1,100)
+        #Calculo X = r^2 mod N
+        x = calcula_v(r,n)
+        #Envia o Challenge que pertence à {0,1}
+        c = server.send_challenge()
+        # Calcula Y = r * S^C mod C 
+        y = calcula_y(r,user.get_senha(user),c,n)
+        #Faz a verificação se são iguais
+        if(server.verifica(x,y,v,c,n) == True):
+            accept += 1
+        else:
+            print("Senha errada")
+            break
+    #Verifica se todos deram corretos
+    if(accept == 5):
+        print("Log in foi um sucesso")
 
 #Criando o Verificador, Provador, N, R e senha
 user = Usuario
 server = Servidor
-
+#Criando N com multiplicação de primos
 n = get_n()
-print("N = ", n)
 url = "localhost::8080"
-user._init_(user)
-user.set_senha(user,"secreto")
-user.register_user(user,url)
+#Função de cadastro
+cadastro_usuario(n,url,user,server)
+#Faz o calculo de V = S^2 mod N
 v = calcula_v(user.get_senha(user),n)
-print("V = ",v)
-r = random.randint(1,100)
-print("R = ",r)
-x = calcula_v(r,n)
-print("X = ", x)
-c = server.send_challenge()
-print("C = ", c)
-y = calcula_y(r,user.get_senha(user),c,n)
-
-print(server.verifica(x,y,v,c,n))
+print("Cadastro realizado com sucesso")
+#Função de Log In
+log_in(user,n,v,server,url)
