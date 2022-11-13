@@ -3,7 +3,6 @@ import random
 class Servidor:
     def _init_(self):
         self.senhaUsuario = 0
-        self.calculoSenha = 0
 
     def register_server(self,r,n):
         func_registro = (r ** 2) % n
@@ -18,10 +17,12 @@ class Servidor:
     def verifica(x,y,v,c,n):
         print(y)
         y_quad = y ** 2
-        print(y_quad)
+        print("y^2 = ", y_quad)
         calculo = (x * (v ** c)) % n
         print("calculo = ", calculo)
-        if y_quad == calculo:
+        y_mod = y_quad % n
+        calc_mod = calculo % n
+        if y_mod == calculo:
             return True
         else:
             return False
@@ -63,47 +64,29 @@ def calcula_v(s,n):
     return (s ** 2) % n
 
 def calcula_y(r,s,c,n):
-    return (r * (s ** c)) % n
+    y = (r * (s ** c)) % n
+    print("Y = ",y)
+    return y
 
 
 #Criando o Verificador, Provador, N, R e senha
 user = Usuario
 server = Servidor
-# n = get_n()
-# r = random.random()
-# url = "localhost::8080"
-# u._init_(u)
-# s._init_(s)
-# u.set_senha(u,"secreto")
-# #----------------------------------------
-# #Calculando V = S^2 mod N
-# u.register_user(u,url)
-# v = calcula_v(u.get_senha(u),n)
-# #Escolhendo o R e Calculando x = r^2 mod N
-# s.register_server(s,r,n)
 
-# #Enviando desafio
-# c = s.send_challenge()
-# print(c)
-
-# #Calculando Y
-
-# y = calcula_y(r,u.get_senha(u),c,n)
-
-# #Verificando se esta correto
-
-# print(s.verifica(s,y,v,c,n))
-
-n = 35
-s = 16
-v = calcula_v(s,n)
-print("v = ", v)
-
-r = 10
+n = get_n()
+print("N = ", n)
+url = "localhost::8080"
+user._init_(user)
+user.set_senha(user,"secreto")
+user.register_user(user,url)
+v = calcula_v(user.get_senha(user),n)
+print("V = ",v)
+r = random.randint(1,100)
+print("R = ",r)
 x = calcula_v(r,n)
-print("x = ", x)
-c = 0
-y = calcula_y(r,s,c,n)
-print("y = ", y)
+print("X = ", x)
+c = server.send_challenge()
+print("C = ", c)
+y = calcula_y(r,user.get_senha(user),c,n)
+
 print(server.verifica(x,y,v,c,n))
-#----------------------------------TODO: CONGRUENCIA EM PYTHON -------------------------------------------------
