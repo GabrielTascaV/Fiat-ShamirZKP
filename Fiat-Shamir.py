@@ -64,8 +64,11 @@ def calcula_v(s,n):
     return (s ** 2) % n
 
 def calcula_y(r,s,c,n):
-    y = (r * (s ** c)) % n
-    return y
+    if(c == 0):
+        return r
+    else: 
+        y = (r * s) % n
+        return y
 
 def cadastro_usuario(n,url,user,server):
     #Digita a senha
@@ -73,7 +76,6 @@ def cadastro_usuario(n,url,user,server):
     user.set_senha(user,senha)
     #transforma a senha e url em um Hash e armazena
     user.register_user(user,url)
-    print("Cadastrado com sucesso")
 
 def log_in(user,n,v,server,url):
     #Digita a senha de Log-In
@@ -101,12 +103,14 @@ def log_in(user,n,v,server,url):
     if(accept == 5):
         print("Log in foi um sucesso")
 
+
+
 #Criando o Verificador, Provador, N, R e senha
 user = Usuario
 server = Servidor
 #Criando N com multiplicação de primos
 n = get_n()
-url = "localhost::8080"
+url = "localhost:8080"
 #Função de cadastro
 cadastro_usuario(n,url,user,server)
 #Faz o calculo de V = S^2 mod N
@@ -114,3 +118,40 @@ v = calcula_v(user.get_senha(user),n)
 print("Cadastro realizado com sucesso")
 #Função de Log In
 log_in(user,n,v,server,url)
+
+def exemplo_peggy_1():
+    server = Servidor
+    n = 35
+    s = 16
+    v = calcula_v(s,n)
+    print("V: ", v)
+    r = 10
+    x = calcula_v(r,n)
+    print("X: ", x)
+    c = 0
+    y = calcula_y(r,s,c,n)
+    print("Y: ", y)
+    ver = server.verifica(x,y,v,c,n)
+    print("Verifica: ", ver)
+
+
+print("Exemplo Peggy 1")
+#exemplo_peggy_1()
+
+def exemplo_peggy_2():
+    server = Servidor
+    n = 35
+    s = 16
+    v = calcula_v(s,n)
+    print("V: ", v)
+    r = 20
+    x = calcula_v(r,n)
+    print("X: ", x)
+    c = 1
+    y = calcula_y(r,s,c,n)
+    print("Y: ", y)
+    ver = server.verifica(x,y,v,c,n)
+    print("Verifica: ", ver)
+
+print("Exemplo Peggy 2")
+#exemplo_peggy_2()
