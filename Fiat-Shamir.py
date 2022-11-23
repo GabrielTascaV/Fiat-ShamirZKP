@@ -1,11 +1,14 @@
 import random
 
 class Servidor:
-    def _init_(self):
+    def _init_(self,url):
         self.senhaUsuario = 0
+        self.urlSite = url
 
     def set_senha(self,senha):
         self.senhaUsuario = senha
+    def get_senha(self):
+        return self.senhaUsuario    
 
     def register_server(self,r,n):
         func_registro = (r ** 2) % n
@@ -34,11 +37,13 @@ class Usuario:
     def set_senha(self,s):
         self.senhaUsuario = s
 
-    def register_user(self,url):
+    def register_user(self,url,server:Servidor):
         s = hash(self.senhaUsuario+url)
         if(s<0):
             s = -(s)
         self.senhaUsuario = s
+        server.set_senha(server,s)
+        
 
     def get_senha(self):
         return self.senhaUsuario
@@ -75,13 +80,15 @@ def cadastro_usuario(n,url,user,server):
     senha = input("Digite sua senha de cadastro: ")
     user.set_senha(user,senha)
     #transforma a senha e url em um Hash e armazena
-    user.register_user(user,url)
+    user.register_user(user,url,server)
+    print("")
+    print("Senha armazenada no servidor: ", server.get_senha(server))
 
 def log_in(user,n,v,server,url):
     #Digita a senha de Log-In
     nova_senha =input("Digite sua senha para log in: ")
     user.set_senha(user,nova_senha)
-    user.register_user(user,url)
+    user.register_user(user,url,server)
     accept = 0
     #Faz o loop 5 vezes pois caso Challenge de 0 de primeira não faria sentido o teste
     for i in range(0,5):
@@ -107,18 +114,45 @@ def log_in(user,n,v,server,url):
 
 #Criando o Verificador, Provador, N, R e senha
 user = Usuario
-server = Servidor
+url1 = "google.com"
+url2 = "facebook.com"
+server1 = Servidor
+server1._init_(server1,url1)
+server2 = Servidor
+server2._init_(server2,url1)
 #Criando N com multiplicação de primos
 n = get_n()
-url = "localhost:8080"
-#Função de cadastro
-cadastro_usuario(n,url,user,server)
-#Faz o calculo de V = S^2 mod N
-v = calcula_v(user.get_senha(user),n)
-print("Cadastro realizado com sucesso")
-#Função de Log In
-log_in(user,n,v,server,url)
 
+
+#-------------- SERVER 1------------------------
+#Função de cadastro
+print("Cadastro site 1: (url: google.com)")
+cadastro_usuario(n,url1,user,server1)
+#Faz o calculo de V = S^2 mod N
+v1 = calcula_v(user.get_senha(user),n)
+print("Cadastro no Google realizado com sucesso")
+print("")
+print("")
+
+
+#--------------- SERVER 2 ---------------------
+#Função de cadastro
+print("Cadastro site 2: (url: facebook.com)")
+cadastro_usuario(n,url2,user,server2)
+#Faz o calculo de V = S^2 mod N
+v2 = calcula_v(user.get_senha(user),n)
+print("Cadastro no Facebook realizado com sucesso")
+
+# ---------------------LOG IN---------------------
+print("")
+print("")
+print("LOG IN FACEBOOK")
+log_in(user,n,v1,server1,url1)
+print("")
+print("")
+print("LOG IN GOOGLE")
+log_in(user,n,v2,server2,url2)
+# ------------------------------------------------
 def exemplo_peggy_1():
     server = Servidor
     n = 35
@@ -135,8 +169,8 @@ def exemplo_peggy_1():
     print("Verifica: ", ver)
 
 
-print("Exemplo Peggy 1")
-#exemplo_peggy_1()
+# print("Exemplo Peggy 1")
+# exemplo_peggy_1()
 
 def exemplo_peggy_2():
     server = Servidor
@@ -153,5 +187,5 @@ def exemplo_peggy_2():
     ver = server.verifica(x,y,v,c,n)
     print("Verifica: ", ver)
 
-print("Exemplo Peggy 2")
-#exemplo_peggy_2()
+# print("Exemplo Peggy 2")
+# exemplo_peggy_2()
