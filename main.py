@@ -1,108 +1,65 @@
-import random
+import secrets
+import os
+from fiat_shamir_lib.user import UserReal
+from fiat_shamir_lib.server import ServerReal
 
-# Importa as classes
-from User import User
-from Server import Server
+def main():
 
-# -----------------------------------------
-# FUNÇÕES AUXILIARES
-# -----------------------------------------
-def get_primo():
-    """Gera aleatoriamente um 'primo' pequeno, apenas fins didáticos."""
-    x = random.randint(2, 50)
-    for i in range(2, x):
-        if x % i == 0:
-            return get_primo()
-    else:
-        return x
+    user = UserReal()
+    server = ServerReal()
 
-def get_n():
-    """
-    Gera n = p*q, com p e q retornados por get_primo().
-    Lembrando que aqui p e q são muito pequenos
-    e não servem para segurança real.
-    """
-    p = get_primo()
-    q = get_primo()
-    return p * q
+    user_id = "usuario1"
 
-def calcula_v(s, n):
-    """Retorna s^2 mod n."""
-    return pow(s, 2, n)
+    # 1) CADASTRO
+    senha_cadastro = input("Digite sua senha para CADASTRO: ")
+    user.start_protocol(senha_cadastro, bits=1024)
+    n = user.get_n()
+    v = user.get_public_value_v()
 
-def calcula_y(r, s, c, n):
-    """
-    Gera a resposta y ao desafio c.
-    Se c=0 => y = r,
-    se c=1 => y = (r*s) mod n.
-    """
-    if c == 0:
-        return r
-    else:
-        return (r * s) % n
+    # Grava o cadastro no log de usuários
+    with open("fiat_shamir_lib/logs/usuarios_log.txt", "a", encoding="utf-8") as f:
+        f.write(f"Novo cadastro user_id={user_id}\n")
+        f.write(f"Senha em texto: {senha_cadastro}\n")
+        f.write(f"s (hash) = {user.get_s()}\n")
+        f.write(f"Public v = {v}\n")
+        f.write(f"n = {n}\n\n")
 
-# -----------------------------------------
-# FLUXO DE CADASTRO E LOGIN
-# -----------------------------------------
-def cadastro_usuario(n, url, user, server):
-    senha = input("Digite sua senha de cadastro: ")
-    # Guarda senha "em bruto" no objeto Usuario
-    user.set_senha(senha)
-    # Faz register_user: cria s = hash(senha+url) e set_senha no servidor
-    user.register_user(url, server)
+    # Registra no servidor
+    server.register_user(user_id, n, v)
+    print(f"Cadastro concluído.")
 
-    print("\nSenha armazenada no servidor:", server.get_senha())
-    # Observação: Em um Fiat-Shamir completo, o servidor guardaria
-    # v = s^2 mod n, mas aqui o código está simplificado.
+    # 2) LOGIN
+    senha_login = input("\nDigite sua senha para LOGIN: ")
 
-def log_in(user, n, v, server, url):
-    nova_senha = input("Digite sua senha para log in: ")
-    user.set_senha(nova_senha)
-    user.register_user(url, server)
+    # Log do user
+    with open("fiat_shamir_lib/logs/usuarios_log.txt", "a", encoding="utf-8") as f:
+        f.write(f"Login user_id={user_id}\n")
+        f.write(f"Senha em texto (login): {senha_login}\n")
+        f.write(f"S = {user.get_s()}\n\n")
 
-    accept = 0
-    # Roda 5 vezes (cada vez gerando r, c e testando)
-    for i in range(5):
-        r = random.randint(1, 100)
-        x = pow(r, 2, n)  # x = r^2 mod n
-        c = server.send_challenge()
-        # Gera y
-        # (no solve_challenge está retornando r, mas poderia ser sofisticado)
-        y = calcula_y(r, user.get_senha(), c, n)
+    # Realiza K rodadas, precisa de K rodadas?
+    K = 3
+    success = True
+
+    for i in range(K):
+        x = user.calculate_x()
+
+        # Pede challenge ao servidor
+        c = server.send_challenge(bits=128, log_file="fiat_shamir_lib/logs/server_log.txt")
+
+        y = user.calculate_y(senha_login,c)
 
         # Verifica
-        if server.verifica(x, y, v, c, n):
-            accept += 1
-        else:
-            print("Senha errada na rodada", i+1)
+        ok = server.verify(user_id, x, y, c, log_file="fiat_shamir_lib/logs/server_log.txt")
+        print(f"Rodada {i+1}: ", "OK" if ok else "Falhou")
+        if not ok:
+            success = False
             break
 
-    if accept == 5:
-        print("Log in foi um sucesso!")
+    if success:
+        print("\nLogin bem-sucedido!")
     else:
-        print("Falha no log in.")
-
-# -----------------------------------------
-# MAIN
-# -----------------------------------------
-def main():
-    # Instancia um Usuario e um Servidor
-    user = User()
-    server = Server("google.com")
-
-    # Cria n
-    n = get_n()
-
-    print("---- CADASTRO ----")
-    cadastro_usuario(n, "google.com", user, server)
-
-    # Em um Fiat-Shamir real, o servidor guardaria v = s^2 mod n
-    # No código original, user.get_senha() já está transformada
-    v = calcula_v(user.get_senha(), n)
-    print("Cadastro concluído. Valor v =", v)
-
-    print("\n---- LOGIN ----")
-    log_in(user, n, v, server, "google.com")
+        print("\nFalha na autenticação.")
 
 if __name__ == "__main__":
     main()
