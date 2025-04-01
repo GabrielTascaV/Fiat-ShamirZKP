@@ -1,7 +1,15 @@
-Server
-User
-
-User defines a password s (clear text), that for each application will be different because the Hash value will be calculated with Password + website domain. 
-User calculate a public value equivalent to v = s^2 mod n
-Server stores v
-When the User 
+Passos:
+	Cadastro:
+	- Usuário cria uma senha = S(privado)
+	- Gera N(publico) = p * q (128 bits)
+	- Gera V(publico) = S^2 mod N 
+	- Registra no servidor o usuário com o N e V
+	Login:
+	- Gera R = aleatório de 128 bits
+	- Usuário calcula X = R^2 mod N
+	- Envia para X para servidor
+	- Servidor gera um C aleatório para desafio
+	- Envia C para Usuário
+	- Usuário calcula Y = R * (S^C) mod N
+	- Envia Y para servidor
+	- Servidor verifica se Y^2 = X * (V^C) mod N

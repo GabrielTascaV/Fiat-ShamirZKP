@@ -3,7 +3,7 @@ import secrets
 from Crypto.Util import number
 import os
 
-class UserReal:
+class User:
     """
     O 'usuário' guarda:
       - n (produto de 2 primos grandes)

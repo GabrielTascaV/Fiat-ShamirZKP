@@ -1,6 +1,6 @@
 import secrets
 
-class ServerReal:
+class Server:
     """
     Guarda (n, v) p/ cada user. Gera c (challenge) de bits e verifica.
     """
