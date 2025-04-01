@@ -1,0 +1,7 @@
+Server
+User
+
+User defines a password s (clear text), that for each application will be different because the Hash value will be calculated with Password + website domain. 
+User calculate a public value equivalent to v = s^2 mod n
+Server stores v
+When the User 
