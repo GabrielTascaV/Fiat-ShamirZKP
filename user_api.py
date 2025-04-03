@@ -6,16 +6,19 @@ from fiat_shamir_lib.user import User
 app = FastAPI()
 user_instance = User()
 
+# Classe para os dados de registro
 class RegisterRequest(BaseModel):
     user_id: str
     password: str
 
+# Classe para os dados de login
 class LoginRequest(BaseModel):
     user_id: str
     password: str
 
 SERVER_URL = "http://localhost:8001"
 
+# Endpoint para enviar o registro do usuário para o servidor
 @app.post("/register")
 def register(req: RegisterRequest):
     user_instance.start_protocol(req.password)
@@ -36,6 +39,8 @@ def register(req: RegisterRequest):
     })
     return {"status": res.status_code, "message": "User registered and sent to server."}
 
+# Endpoint para fazer todo o processo de login do usuário
+# (desafio, resposta e verificação)
 @app.post("/login")
 def login(req: LoginRequest):
     x = user_instance.calculate_x()
@@ -47,7 +52,7 @@ def login(req: LoginRequest):
     challenge = requests.get(f"{SERVER_URL}/challenge/{req.user_id}").json()["c"]
     
     y = user_instance.calculate_y(req.password, challenge)
-
+ 
     verify_res = requests.post(f"{SERVER_URL}/verify", json={
         "user_id": req.user_id,
         "x": x,
