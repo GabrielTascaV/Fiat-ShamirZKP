@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fiat_shamir_lib.server import Server
+import os
 
 app = FastAPI()
 server_instance = Server()
+SERVER_LOGS = os.getenv("SERVER_LOGS", "/logs/servidor_log.txt")
 
 # Classe para os dados de registro
 class RegisterData(BaseModel):

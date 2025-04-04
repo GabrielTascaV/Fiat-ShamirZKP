@@ -1,8 +1,19 @@
 import requests
 
-USER_API_URL = "http://172.17.8.9:8000"
+def escolher_api():
+    dominio = input("Digite o domínio (example.com ou example.org): ").strip()
+    if dominio == "amazon":
+        return "http://172.17.8.9:8000"
+    elif dominio == "google":
+        return "http://172.17.8.9:8002"
+    else:
+        print("Domínio inválido.")
+        return escolher_api()
 
 def cadastrar_usuario():
+    global USER_API_URL
+    USER_API_URL = escolher_api()
+
     user_id = input("Digite o user_id para cadastro: ")
     senha = input("Digite a senha: ")
 
@@ -17,6 +28,8 @@ def cadastrar_usuario():
         print(f"Erro ao cadastrar: {response.text}")
 
 def fazer_login():
+    USER_API_URL = escolher_api()
+
     user_id = input("Digite o user_id para login: ")
     senha = input("Digite a senha: ")
 
