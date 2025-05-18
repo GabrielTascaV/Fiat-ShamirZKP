@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import requests
+import os
 from fiat_shamir_lib.user import User
 
 app = FastAPI()
@@ -16,16 +17,19 @@ class LoginRequest(BaseModel):
     user_id: str
     password: str
 
-SERVER_URL = "http://172.17.8.9:8001"
-domain_name = "example.com"  # Nome de domínio fictício para o exemplo
+SERVER_URL = os.getenv("SERVER_URL", "http://server_api:8001")
+DOMAIN_NAME = os.getenv("DOMAIN_NAME", "example.com") # Nome de domínio fictício para o exemplo
+USER_LOGS = os.getenv("USER_LOGS", "/logs/usuarios_log.txt")
 
 # Endpoint para enviar o registro do usuário para o servidor
 @app.post("/register")
 def register(req: RegisterRequest):
-    req.password = req.password + domain_name  # Adiciona o domínio à senha
+    req.password = req.password + DOMAIN_NAME  # Adiciona o domínio à senha
     user_instance.start_protocol(req.password)
     n = user_instance.get_n()
     v = user_instance.get_public_value_v()
+
+    print(f"v = {v}")
 
     with open("fiat_shamir_lib/logs/usuarios_log.txt", "a", encoding="utf-8") as f:
         f.write(f"Novo cadastro user_id={req.user_id}\n")
@@ -46,7 +50,7 @@ def register(req: RegisterRequest):
 @app.post("/login")
 def login(req: LoginRequest):
     x = user_instance.calculate_x()
-    req.password = req.password + domain_name  # Adiciona o domínio à senha
+    req.password = req.password + DOMAIN_NAME  # Adiciona o domínio à senha
     # Log do user
     with open("fiat_shamir_lib/logs/usuarios_log.txt", "a", encoding="utf-8") as f:
         f.write(f"Login user_id={req.user_id}\n")
