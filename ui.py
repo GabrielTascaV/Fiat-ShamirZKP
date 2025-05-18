@@ -1,7 +1,7 @@
 import requests
 
 def escolher_api():
-    dominio = input("Digite o domínio (example.com ou example.org): ").strip()
+    dominio = input("Digite o domínio (amazon ou google): ").strip()
     if dominio == "amazon":
         return "http://172.17.8.9:8000"
     elif dominio == "google":

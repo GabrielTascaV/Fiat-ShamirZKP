@@ -29,7 +29,7 @@ def register(req: RegisterRequest):
     n = user_instance.get_n()
     v = user_instance.get_public_value_v()
 
-    print(v)
+    print(f"v = {v}")
 
     with open("fiat_shamir_lib/logs/usuarios_log.txt", "a", encoding="utf-8") as f:
         f.write(f"Novo cadastro user_id={req.user_id}\n")
