@@ -2,7 +2,7 @@ import secrets
 
 class Server:
     """
-    Guarda (n, v) p/ cada user. Gera c (challenge) de bits e verifica.
+    Guarda (n, v, lastX) p/ cada user. Gera c (challenge) de bits e verifica.
     """
 
     def __init__(self):
