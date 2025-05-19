@@ -9,7 +9,7 @@ services:
     ports:
       - "8001:8001"
     environment:
-      - SERVER_LOG = logs/server_log_1.txt
+      - DOMAIN_NAME=amazon
     volumes:
       - ./logs:/logs
     networks:
@@ -23,7 +23,7 @@ services:
     ports:
       - "8003:8003"
     environment:
-      - SERVER_LOG = logs/server_log_2.txt
+      - DOMAIN_NAME=google
     volumes:
       - ./logs:/logs
     networks:
@@ -39,7 +39,6 @@ services:
     environment:
       - DOMAIN_NAME=amazon.com
       - SERVER_URL=http://server_api_1:8001
-      - USER_LOG = logs/user_log_1.txt
     volumes:
       - ./logs:/logs
     networks:
@@ -57,7 +56,6 @@ services:
     environment:
       - DOMAIN_NAME=google.com
       - SERVER_URL=http://server_api_2:8003
-      - USER_LOG = logs/user_log_2.txt
     volumes:
       - ./logs:/logs
     networks:

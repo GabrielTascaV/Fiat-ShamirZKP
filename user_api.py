@@ -6,7 +6,6 @@ from fiat_shamir_lib.user import User
 
 app = FastAPI()
 user_instance = User()
-
 # Classe para os dados de registro
 class RegisterRequest(BaseModel):
     user_id: str
@@ -18,8 +17,7 @@ class LoginRequest(BaseModel):
     password: str
 
 SERVER_URL = os.getenv("SERVER_URL", "http://server_api:8001")
-DOMAIN_NAME = os.getenv("DOMAIN_NAME", "example.com") # Nome de domínio fictício para o exemplo
-USER_LOGS = os.getenv("USER_LOGS", "/logs/usuarios_log.txt")
+DOMAIN_NAME = os.getenv("DOMAIN_NAME")
 
 # Endpoint para enviar o registro do usuário para o servidor
 @app.post("/register")
@@ -31,12 +29,11 @@ def register(req: RegisterRequest):
 
     print(f"v = {v}")
 
-    with open("fiat_shamir_lib/logs/usuarios_log.txt", "a", encoding="utf-8") as f:
-        f.write(f"Novo cadastro user_id={req.user_id}\n")
-        f.write(f"Senha em texto: {req.password}\n")
-        f.write(f"s (hash) = {user_instance.get_s()}\n")
-        f.write(f"Public v = {v}\n")
-        f.write(f"n = {n}\n\n")
+    print(f"Novo cadastro user_id={req.user_id}\n")
+    print(f"Senha em texto: {req.password}\n")
+    print(f"s (hash) = {user_instance.get_s()}\n")
+    print(f"Public v = {v}\n")
+    print(f"n = {n}\n\n")
     
     res = requests.post(f"{SERVER_URL}/register", json={
         "user_id": req.user_id,
@@ -52,9 +49,8 @@ def login(req: LoginRequest):
     x = user_instance.calculate_x()
     req.password = req.password + DOMAIN_NAME  # Adiciona o domínio à senha
     # Log do user
-    with open("fiat_shamir_lib/logs/usuarios_log.txt", "a", encoding="utf-8") as f:
-        f.write(f"Login user_id={req.user_id}\n")
-        f.write(f"Senha em texto (login): {req.password}\n")
+    print(f"Login user_id={req.user_id}\n")
+    print(f"Senha em texto (login): {req.password}\n")
     
     challenge = requests.get(f"{SERVER_URL}/challenge/{req.user_id}").json()["c"]
     
