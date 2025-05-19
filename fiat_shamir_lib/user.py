@@ -12,8 +12,6 @@ class User:
     """
 
     def __init__(self):
-        with open("fiat_shamir_lib/logs/usuarios_log.txt", "w", encoding="utf-8") as f:
-            f.write("=== LOG DE USUARIOS ===\n")
         # Produto de 2 primos
         self.n = None
         # Senha armazenada em formato de hash
@@ -21,9 +19,9 @@ class User:
         # Valor aleatório
         self.r = None
 
-    def start_protocol(self, pass_str, bits=1024):
+    def start_protocol(self, pass_str, bits=2048):
         """
-        1) Gera p, q => n = p*q (bits ~ 1024)
+        1) Gera p, q => n = p*q (bits = 2048)
         2) Converte pass_str -> s via SHA-256 (mod n)
         3) Garante gcd(s, n)=1
         """

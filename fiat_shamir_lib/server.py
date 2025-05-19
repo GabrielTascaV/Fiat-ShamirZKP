@@ -7,27 +7,22 @@ class Server:
 
     def __init__(self):
         # Limpando / iniciando logs (opcional)
-        with open("fiat_shamir_lib/logs/server_log.txt", "w", encoding="utf-8") as f:
-            f.write("=== LOG DO SERVIDOR ===\n")
         self.db = {}  # user_id -> (n, v)
 
     def register_user(self, user_id, n, v):
         self.db[user_id] = (n, v)
 
-    def send_challenge(self, bits=128, log_file="fiat_shamir_lib/logs/server_log.txt"):
+    def send_challenge(self, bits=128):
         """
         Gera um desafio c de bits bits. O desafio é um número aleatório de 128 bits.
         O desafio é gerado usando a função randbits do módulo secrets, que gera um número inteiro aleatório com a quantidade de bits desejada.
         O número gerado é armazenado no log do servidor.
         """
         c = secrets.randbits(bits)
-        # Registrando no log
-        with open(log_file, "a", encoding="utf-8") as f:
-            f.write(f"Novo desafio gerado: {c}\n")
         return c
 
     #Verifica se y^2 =>  x * v^c mod n
-    def verify(self, user_id, x, y, c , log_file="fiat_shamir_lib/logs/server_log.txt"):
+    def verify(self, user_id, x, y, c):
         """
         Verifica se y^2 == x * v^c mod n
         onde:
@@ -45,9 +40,5 @@ class Server:
         right = (x * vc) % n
         print(f"x * v^c mod n = {right}")
         ok = (left == right)
-
-        # Log do servidor
-        with open(log_file, "a", encoding="utf-8") as f:
-            f.write(f"Verificando user={user_id}, x={x}, y={y}, c={c}, ok={ok}\n")
 
         return ok
