@@ -52,13 +52,15 @@ def login(req: LoginRequest):
     print(f"Login user_id={req.user_id}\n")
     print(f"Senha em texto (login): {req.password}\n")
     
-    challenge = requests.get(f"{SERVER_URL}/challenge/{req.user_id}").json()["c"]
+    challenge = requests.get(f"{SERVER_URL}/challenge", json={
+        "user_id": req.user_id,
+        "x": x
+    }).json()["c"]
     
     y = user_instance.calculate_y(req.password, challenge)
  
     verify_res = requests.post(f"{SERVER_URL}/verify", json={
         "user_id": req.user_id,
-        "x": x,
         "y": y,
         "c": challenge
     }).json()

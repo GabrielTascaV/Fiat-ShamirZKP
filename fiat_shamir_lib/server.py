@@ -2,27 +2,36 @@ import secrets
 
 class Server:
     """
-    Guarda (n, v) p/ cada user. Gera c (challenge) de bits e verifica.
+    Guarda (n, v, lastX) p/ cada user. Gera c (challenge) de bits e verifica.
     """
 
     def __init__(self):
         # Limpando / iniciando logs (opcional)
-        self.db = {}  # user_id -> (n, v)
+        self.db = {}  # user_id -> (n, v, lastX)
 
-    def register_user(self, user_id, n, v):
-        self.db[user_id] = (n, v)
+    def register_user(self, user_id, n, v, lastX=None):
+        """
+        Armazena (n, v) p/ cada user_id.
+        O valor de n é o módulo e v é o valor público do usuário.
+        O valor de lastX é o último valor de x gerado pelo usuário.
+        O valor de lastX é usado para verificar se o usuário está tentando fazer login com o mesmo valor de x.
+        """
+        self.db[user_id] = (n, v, lastX)
 
-    def send_challenge(self, bits=128):
+    def send_challenge(self, user_id, x, bits=128):
         """
         Gera um desafio c de bits bits. O desafio é um número aleatório de 128 bits.
         O desafio é gerado usando a função randbits do módulo secrets, que gera um número inteiro aleatório com a quantidade de bits desejada.
         O número gerado é armazenado no log do servidor.
         """
+        (n,v, lastX) = self.db.get(user_id)
+        lastX = x
+        self.db[user_id] = (n, v, lastX)
         c = secrets.randbits(bits)
         return c
 
     #Verifica se y^2 =>  x * v^c mod n
-    def verify(self, user_id, x, y, c):
+    def verify(self, user_id, y, c):
         """
         Verifica se y^2 == x * v^c mod n
         onde:
@@ -33,7 +42,7 @@ class Server:
         - n é o módulo (armazenado no servidor)
         """
         user = self.db.get(user_id)
-        (n, v) = user
+        (n, v, x) = user
         left = pow(y, 2, n)
         print(f"y^2 = {left}")
         vc = pow(v, c, n)

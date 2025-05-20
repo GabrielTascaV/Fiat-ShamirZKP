@@ -13,10 +13,14 @@ class RegisterData(BaseModel):
     n: int
     v: int
 
+# Classe para o request de challenge
+class ChallengeData(BaseModel):
+    user_id: str
+    x: int
+
 # Classe para os dados de verificação
 class VerifyData(BaseModel):
     user_id: str
-    x: int
     y: int
     c: int
 
@@ -32,17 +36,17 @@ def register_user(data: RegisterData):
     return {"message": "User registered successfully"}
 
 # Endpoint para enviar o desafio para o usuário
-@app.get("/challenge/{user_id}")
-def get_challenge(user_id: str):
-    c = server_instance.send_challenge()
+@app.get("/challenge/")
+def get_challenge(data: ChallengeData):
+    c = server_instance.send_challenge(data.user_id, data.x)
     # Log do servidor
-    print(f"Desafio enviado para Usuário={user_id}: c={c}\n")
+    print(f"Desafio enviado para Usuário={data.user_id}: c={c}\n")
     return {"c": c}
 
 # Endpoint para verificar o resultado do desafio
 @app.post("/verify")
 def verify(data: VerifyData):
-    result = server_instance.verify(data.user_id, data.x, data.y, data.c)
+    result = server_instance.verify(data.user_id, data.y, data.c)
     # Log do servidor
-    print(f"Verificação user_id={data.user_id}, \nx={data.x}, \ny={data.y}, \nc={data.c}, \nresultado={result}\n")
+    print(f"Verificação user_id={data.user_id}, \ny={data.y}, \nc={data.c}, \nresultado={result}\n")
     return {"login_success": result}
