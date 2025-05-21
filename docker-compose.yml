@@ -9,9 +9,7 @@ services:
     ports:
       - "8001:8001"
     environment:
-      - DOMAIN_NAME=amazon
-    volumes:
-      - ./logs:/logs
+      - DOMAIN_NAME=poa
     networks:
       - fiat_net
 
@@ -23,9 +21,7 @@ services:
     ports:
       - "8003:8003"
     environment:
-      - DOMAIN_NAME=google
-    volumes:
-      - ./logs:/logs
+      - DOMAIN_NAME=pucrs
     networks:
       - fiat_net
 
@@ -33,14 +29,12 @@ services:
     build:
       context: .
     container_name: user_api_1
-    command: bash -c "DOMAIN_NAME=amazon.com SERVER_URL=http://server_api_1:8001 uvicorn user_api:app --host 0.0.0.0 --port 8000"
+    command: bash -c "DOMAIN_NAME=poa.com SERVER_URL=http://server_api_1:8001 uvicorn user_api:app --host 0.0.0.0 --port 8000"
     ports:
       - "8000:8000"
     environment:
-      - DOMAIN_NAME=amazon.com
+      - DOMAIN_NAME=poa.com
       - SERVER_URL=http://server_api_1:8001
-    volumes:
-      - ./logs:/logs
     networks:
       - fiat_net
     depends_on:
@@ -50,14 +44,12 @@ services:
     build:
       context: .
     container_name: user_api_2
-    command: bash -c "DOMAIN_NAME=google.com SERVER_URL=http://server_api_2:8003 uvicorn user_api:app --host 0.0.0.0 --port 8002"
+    command: bash -c "DOMAIN_NAME=pucrs.com SERVER_URL=http://server_api_2:8003 uvicorn user_api:app --host 0.0.0.0 --port 8002"
     ports:
       - "8002:8002"
     environment:
-      - DOMAIN_NAME=google.com
+      - DOMAIN_NAME=pucrs.com
       - SERVER_URL=http://server_api_2:8003
-    volumes:
-      - ./logs:/logs
     networks:
       - fiat_net
     depends_on:

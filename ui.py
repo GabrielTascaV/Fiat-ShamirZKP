@@ -1,10 +1,10 @@
 import requests
 
 def escolher_api():
-    dominio = input("Digite o domínio (amazon ou google): ").strip()
-    if dominio == "amazon":
+    dominio = input("Digite o domínio (poa ou pucrs): ").strip()
+    if dominio == "poa":
         return "http://172.17.8.9:8000"
-    elif dominio == "google":
+    elif dominio == "pucrs":
         return "http://172.17.8.9:8002"
     else:
         print("Domínio inválido.")

@@ -18,7 +18,7 @@ class Server:
         """
         self.db[user_id] = (n, v, lastX)
 
-    def send_challenge(self, user_id, x, bits=128):
+    def send_challenge(self, user_id, x, bits=256):
         """
         Gera um desafio c de bits bits. O desafio é um número aleatório de 128 bits.
         O desafio é gerado usando a função randbits do módulo secrets, que gera um número inteiro aleatório com a quantidade de bits desejada.
